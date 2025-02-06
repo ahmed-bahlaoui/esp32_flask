@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import os
+import requests
 
 app = Flask(__name__)
 
@@ -9,6 +10,9 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# ESP32-CAM IP address
+ESP32_CAM_IP = "http://192.168.143.247"
 
 
 @app.route('/')
@@ -27,8 +31,15 @@ def index():
 
 @app.route('/trigger', methods=['POST'])
 def trigger():
-    # This endpoint triggers the ESP32-CAM to take a picture
-    return jsonify({"message": "Picture request sent to ESP32-CAM"}), 200
+    # Trigger the ESP32-CAM to take a picture
+    try:
+        response = requests.get(f"{ESP32_CAM_IP}/capture")
+        if response.status_code == 200:
+            return jsonify({"message": "Picture captured and sent successfully"}), 200
+        else:
+            return jsonify({"error": f"Failed to trigger ESP32-CAM: {response.text}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Error triggering ESP32-CAM: {str(e)}"}), 500
 
 
 @app.route('/upload', methods=['POST'])
@@ -49,5 +60,3 @@ def upload():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-    print(request.headers)
-    print(request.data)
