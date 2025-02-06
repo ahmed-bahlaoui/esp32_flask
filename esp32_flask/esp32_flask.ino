@@ -17,6 +17,9 @@ void setup() {
   Serial.begin(115200);
   delay(100);      // Short delay to stabilize
   Serial.flush();  // Flush any leftover data in the serial buffer
+  
+  Serial.println("ESP32-CAM starting up...");
+  Serial.println("Memory cleared and ready for new session.");
 
   // Initialize the camera
   camera_config_t config;

@@ -25,12 +25,29 @@ ESP32_CAM_IP = sys.argv[1]
 @app.route('/')
 def index():
     return '''
+    <!DOCTYPE html>
     <html>
+        <head>
+            <title>ESP32-CAM Picture Capture</title>
+            <script>
+                function takePicture() {
+                    // Send an AJAX POST request to the /trigger endpoint
+                    fetch('/trigger', { method: 'POST' })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update the <p> tag with the result
+                            document.getElementById('result').innerText = data.message || data.error;
+                        })
+                        .catch(error => {
+                            document.getElementById('result').innerText = 'Error: ' + error;
+                        });
+                }
+            </script>
+        </head>
         <body>
             <h1>ESP32-CAM Picture Capture</h1>
-            <form action="/trigger" method="POST">
-                <button type="submit">Take Picture</button>
-            </form>
+            <button onclick="takePicture()">Take Picture</button>
+            <p id="result">Result will appear here...</p>
         </body>
     </html>
     '''
