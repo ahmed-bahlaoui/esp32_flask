@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESP32-CAM Picture Capture</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>ESP32-CAM Picture Capture</h1>
+      <button id="capture-btn">Take Picture</button>
+      <p id="result">Result will appear here...</p>
+      <div id="image-container">
+        <img
+          id="last-image"
+          src=""
+          alt="Last Captured Image"
+          style="display: none; max-width: 100%; margin-top: 20px"
+        />
+      </div>
+    </div>
+    <script src="/static/script.js"></script>
+  </body>
+</html>

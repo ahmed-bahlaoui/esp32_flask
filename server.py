@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import time  # For generating timestamps
 import requests
@@ -24,33 +24,7 @@ ESP32_CAM_IP = sys.argv[1]
 
 @app.route('/')
 def index():
-    return '''
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>ESP32-CAM Picture Capture</title>
-            <script>
-                function takePicture() {
-                    // Send an AJAX POST request to the /trigger endpoint
-                    fetch('/trigger', { method: 'POST' })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Update the <p> tag with the result
-                            document.getElementById('result').innerText = data.message || data.error;
-                        })
-                        .catch(error => {
-                            document.getElementById('result').innerText = 'Error: ' + error;
-                        });
-                }
-            </script>
-        </head>
-        <body>
-            <h1>ESP32-CAM Picture Capture</h1>
-            <button onclick="takePicture()">Take Picture</button>
-            <p id="result">Result will appear here...</p>
-        </body>
-    </html>
-    '''
+    return render_template('index.html')  # Serve the external HTML file
 
 
 @app.route('/trigger', methods=['POST'])
@@ -83,6 +57,27 @@ def upload():
         f.write(image_data)
 
     return jsonify({"message": f"File {filename} uploaded successfully"}), 200
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/last_image')
+def last_image():
+    # Get the list of files in the uploads folder
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    if not files:
+        return jsonify({"error": "No images found"}), 404
+
+    # Sort files by modification time (most recent first)
+    files.sort(key=lambda x: os.path.getmtime(
+        os.path.join(app.config['UPLOAD_FOLDER'], x)), reverse=True)
+    last_image_name = files[0]
+
+    # Return the URL of the most recent image
+    return jsonify({"image_url": f"/uploads/{last_image_name}"})
 
 
 if __name__ == '__main__':
