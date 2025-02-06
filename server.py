@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import os
+import time  # For generating timestamps
 import requests
+import sys  # For handling command-line arguments
 
 app = Flask(__name__)
 
@@ -11,8 +13,13 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# ESP32-CAM IP address
-ESP32_CAM_IP = "http://192.168.143.247"
+# Check if the ESP32-CAM IP address is provided as a command-line argument
+if len(sys.argv) < 2:
+    print("Usage: python app.py <ESP32_CAM_IP>")
+    sys.exit(1)
+
+# Get the ESP32-CAM IP address from the first argument
+ESP32_CAM_IP = sys.argv[1]
 
 
 @app.route('/')
@@ -33,7 +40,7 @@ def index():
 def trigger():
     # Trigger the ESP32-CAM to take a picture
     try:
-        response = requests.get(f"{ESP32_CAM_IP}/capture")
+        response = requests.get(f"http://{ESP32_CAM_IP}/capture")
         if response.status_code == 200:
             return jsonify({"message": "Picture captured and sent successfully"}), 200
         else:
@@ -49,9 +56,12 @@ def upload():
     if not image_data:
         return jsonify({"error": "No image data received"}), 400
 
-    # Save the image to the uploads folder
-    filename = "image.jpg"
+    # Generate a unique filename using a timestamp
+    timestamp = int(time.time())  # Current Unix timestamp
+    filename = f"image_{timestamp}.jpg"
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    # Save the image to the uploads folder
     with open(filepath, 'wb') as f:
         f.write(image_data)
 
