@@ -1,12 +1,21 @@
 document.getElementById("capture-btn").addEventListener("click", function () {
-  // Send an AJAX POST request to the /trigger endpoint
+  // Show the notification
+  const notification = document.getElementById("notification");
+  notification.style.display = "block"; // Make the notification visible
+
+  // Hide the notification after 2 seconds
+  setTimeout(() => {
+    notification.style.display = "none"; // Hide the notification
+  }, 2000); // 2000ms = 2 seconds
+
+  // Trigger the ESP32-CAM to take a picture
   fetch("/trigger", { method: "POST" })
     .then((response) => response.json())
     .then((data) => {
       // Update the result message
       document.getElementById("result").innerText = data.message || data.error;
 
-      // Fetch the URL of the last image
+      // Fetch and display the last image
       fetch("/last_image")
         .then((response) => {
           if (!response.ok) {

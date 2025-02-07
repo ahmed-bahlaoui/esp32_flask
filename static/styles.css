@@ -58,3 +58,12 @@ h1 {
   font-size: 18px;
   color: #555;
 }
+
+/* Notification styling */
+#notification {
+  font-size: 18px;
+  font-weight: bold;
+  color: green;
+  margin-top: 10px;
+  transition: opacity 0.5s ease-in-out;
+}
