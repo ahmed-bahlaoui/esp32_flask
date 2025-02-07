@@ -29,14 +29,20 @@ def index():
 
 @app.route('/trigger', methods=['POST'])
 def trigger():
-    # Trigger the ESP32-CAM to take a picture
     try:
+        # Send a GET request to the ESP32-CAM's /capture endpoint
         response = requests.get(f"http://{ESP32_CAM_IP}/capture")
+
+        # Log the response for debugging
+        print(f"ESP32-CAM Response: {response.status_code}, {response.text}")
+
         if response.status_code == 200:
             return jsonify({"message": "Picture captured and sent successfully"}), 200
         else:
             return jsonify({"error": f"Failed to trigger ESP32-CAM: {response.text}"}), 500
     except Exception as e:
+        # Log the exception for debugging
+        print(f"Error triggering ESP32-CAM: {str(e)}")
         return jsonify({"error": f"Error triggering ESP32-CAM: {str(e)}"}), 500
 
 

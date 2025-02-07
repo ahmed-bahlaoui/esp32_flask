@@ -64,8 +64,8 @@ void setup() {
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+    delay(2000);
+    Serial.println("Connecting...");
   }
 
   // Print connection status and IP address
